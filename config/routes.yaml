@@ -1,13 +1,9 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
-
 api_data_show:
-    path:       /show/{page}
-    controller: App\Controller\TransactionController::show
-    methods:    GET
+  path: /show/{date}
+  controller: App\Controller\TransactionController::show
+  methods: GET
 
 api_data_import:
-    path:       /show/{page}
-    controller: App\Controller\TransactionController::import
-    methods:    POST
+  path: /import/{date}
+  controller: App\Controller\TransactionController::import
+  methods: POST

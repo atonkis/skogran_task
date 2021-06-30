@@ -1,20 +1,40 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello TransactionController!{% endblock %}
-
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'C:/Users/ThinkPad/Documents/IT/symfony/skogran_task/src/Controller/TransactionController.php'|file_link(0) }}">src/Controller/TransactionController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'C:/Users/ThinkPad/Documents/IT/symfony/skogran_task/templates/transaction/index.html.twig'|file_link(0) }}">templates/transaction/index.html.twig</a></code></li>
-    </ul>
-</div>
+	<div class="container mt-5">
+		<div class="mx-auto" style="width: 200px;">
+			<a href="{{ path('import_data', {date: '2021-03-01'}) }}" class="btn btn-secondary js-import-data">Import data</a>
+		</div>
+		<div class="row mt-2">
+			<table id="datatable" class="table table-striped" style="width:100%">
+				<thead>
+					<tr>
+						<th>Transaction Id</th>
+						<th>Tool number</th>
+						<th>Latitude</th>
+						<th>Longitude</th>
+						<th>Date</th>
+						<th>Bat percentage</th>
+						<th>Import date</th>
+					</tr>
+				</thead>
+                 <tbody>
+                    {% for transaction in data %}
+                        <tr>
+                            <td>{{ transaction.transactionid }}</td>
+                            <td>{{ transaction.toolnumber}}</td>
+                            <td>{{ transaction.latitude }}</td>
+                            <td>{{ transaction.longitude}}</td>
+                            <td>{{ transaction.date |date('Y-m-d H:i:s')}}</td>
+                            <td>{{ transaction.batpercentage}}</td>
+                            <td>{{ transaction.importdate |date('Y-m-d H:i:s')}}</td>
+                        <tr>
+                    {% endfor %}
+                 </tbody>
+			</table>
+		</div>
+	</div>
+
 {% endblock %}
