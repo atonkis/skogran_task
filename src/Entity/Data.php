@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\DataRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=DataRepository::class)
@@ -19,36 +20,43 @@ class Data
 
     /**
      * @ORM\Column(type="string", length=18)
+     * @Groups({"default"})
      */
     private $transactionid;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"default"})
      */
     private $toolNumber;
 
     /**
      * @ORM\Column(type="decimal", precision=11, scale=7)
+     * @Groups({"default"})
      */
     private $latitude;
 
     /**
      * @ORM\Column(type="decimal", precision=11, scale=7)
+     * @Groups({"default"})
      */
     private $longitude;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"default"})
      */
     private $date;
 
     /**
      * @ORM\Column(type="decimal", precision=5, scale=2)
+     * @Groups({"default"})
      */
     private $batPercentage;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"default"})
      */
     private $importDate;
 
@@ -109,6 +117,7 @@ class Data
     {
         return $this->date;
     }
+
 
     public function setDate(\DateTimeInterface $date): self
     {

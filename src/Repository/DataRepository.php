@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Data;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -19,32 +20,15 @@ class DataRepository extends ServiceEntityRepository
         parent::__construct($registry, Data::class);
     }
 
-    // /**
-    //  * @return Data[] Returns an array of Data objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('d')
-            ->andWhere('d.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('d.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?Data
+    public function getLastDate()
     {
         return $this->createQueryBuilder('d')
-            ->andWhere('d.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        ->orderBy('d.id', 'DESC')
+        ->setMaxResults(1)
+        ->select('d.date')
+        ->getQuery()
+        ->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_SCALAR);
     }
-    */
+   
 }
