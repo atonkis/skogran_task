@@ -18,15 +18,10 @@ class TransactionController extends AbstractController
     /**
      * @Route("/show/{date}", name="show_data", methods={"GET"})
      */
-    public function show($date = "2021-03-01", EntityManagerInterface $em, SerializerInterface $serializer) : Response
+    public function show($date = "2021-03-01", DataRepository $dr) : Response
     {
-
-         $repository = $em->getRepository(Data::class);
-         $allData = $repository->findAll();
-        //  $response = $serializer->serialize($allData, 'json', ['groups' => 'default']);
-
         return $this->render('transaction/index.html.twig', [
-            'data' => $allData,
+            'data' => $dr->findAll(),
         ]);
     }
 
