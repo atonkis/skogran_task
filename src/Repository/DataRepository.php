@@ -4,7 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Data;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -20,7 +20,6 @@ class DataRepository extends ServiceEntityRepository
         parent::__construct($registry, Data::class);
     }
 
-
     public function getLastDate()
     {
         return $this->createQueryBuilder('d')
@@ -28,7 +27,7 @@ class DataRepository extends ServiceEntityRepository
         ->setMaxResults(1)
         ->select('d.date')
         ->getQuery()
-        ->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_SCALAR);
+        ->getOneOrNullResult(Query::HYDRATE_SCALAR);
     }
    
 }
