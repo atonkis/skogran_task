@@ -5,7 +5,7 @@
 
 	<div class="container mt-5">
 		<div class="mx-auto" style="width: 200px;">
-			<a href="{{ path('import_data', {date: '2021-03-01'}) }}" class="btn btn-secondary js-import-data">Import data</a>
+			<a href="{{ path('import_data', {  date : app.request.attributes.get('_route_params')['date'] }) }}" class="btn btn-secondary js-import-data">Import data</a>
 		</div>
 		<div class="row mt-2">
 			<table id="datatable" class="table table-striped" style="width:100%">

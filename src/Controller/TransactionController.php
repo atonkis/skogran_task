@@ -17,7 +17,7 @@ class TransactionController extends AbstractController
     /**
      * @Route("/show/{date}", name="show_data", methods={"GET"})
      */
-    public function show($date = "2021-03-01", DataRepository $dr): Response
+    public function show($date, DataRepository $dr): Response
     {
         return $this->render('transaction/index.html.twig', [
             'data' => $dr->findAll(),
@@ -29,10 +29,10 @@ class TransactionController extends AbstractController
     /**
      * @Route("/import/{date}", name="import_data", methods={"POST"})
      */
-    public function import($date = "2021-03-01", Request $request, TransactionService $ts, EntityManagerInterface $em, DataRepository $dr)
+    public function import($date, TransactionService $ts, EntityManagerInterface $em)
     {
 
-        $dataApi = $ts->getTransactionData("2021-03-01", $initialPage = 1);
+        $dataApi = $ts->getTransactionData($date, $initialPage = 1);
 
         $canImport = $ts->CanImportData($dataApi);
 
