@@ -9,6 +9,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+use function PHPUnit\Framework\isNull;
+
 class TransactionService
 {
 
@@ -27,6 +29,20 @@ class TransactionService
         $this->dr = $dr;
     }
 
+
+    public function getDateForDataApiRequest(string $date) : string
+    {
+        $date = $date; //default min date
+
+        $lastDateInDb = $this->dr->getLastDate();
+
+        if(!is_null($lastDateInDb)){
+            $date = date('Y-m-d', strtotime($lastDateInDb['date']));
+        } 
+        
+        return $date;
+    }
+    
     public function getTransactionData($date, $initialPage)
     {
         $decodedApiData = $this->getDataFromApi($date, $initialPage);
@@ -110,7 +126,7 @@ class TransactionService
     }
 
     
-
+    //TODO eliminate unique Date values 
     private function SaveInBulk(array $dataApi, int $indexStart, int $mintimeConstrain, int $maxtimeConstrain)
     {
 
