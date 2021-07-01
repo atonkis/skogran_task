@@ -1,9 +1,9 @@
-api_data_show:
+show_data:
   path: /show/{date}
   controller: App\Controller\TransactionController::show
   methods: GET
 
-api_data_import:
+import_data:
   path: /import/{date}
   controller: App\Controller\TransactionController::import
   methods: POST
