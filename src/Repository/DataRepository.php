@@ -29,5 +29,13 @@ class DataRepository extends ServiceEntityRepository
         ->getQuery()
         ->getOneOrNullResult(Query::HYDRATE_SCALAR);
     }
+
+    public function getLimitData($limit)
+    {
+        return $this->createQueryBuilder('d')
+        ->setMaxResults($limit)
+        ->getQuery()
+        ->getResult();
+    }
    
 }

@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Data;
 use App\Repository\DataRepository;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -40,7 +41,7 @@ class TransactionService
 
         return  $this->mergedDataArray;
     }
-    
+
 
     private function getDataFromApi($date, $page)
     {
@@ -62,49 +63,84 @@ class TransactionService
     }
 
 
-    public function CanImportData(Array $dataApi){
-        
-        if(!isset($dataApi)) return true;
+    public function ImportData(array $dataApi)
+    {
 
+        $mintimeConstrain = strtotime("-1 year", time());
+        $maxtimeConstrain = time();
+        
+        $indexStart = 0;
+        $lastDateInDb = $this->dr->getLastDate();
         $lastDateInApi = $dataApi[array_key_last($dataApi)]->date;
 
-        $lastDateInDb = $this->dr->getLastDate();
+        if (is_null($lastDateInDb)) {
 
-        if(!is_null($lastDateInDb) and strcmp($lastDateInDb['date'], $lastDateInApi)==0) return false;
+            $indexStart = 0; // import all as db empty
 
-        return true;
-        
+        } else if (!is_null($lastDateInDb) and strtotime($lastDateInDb['date']) == strtotime($lastDateInApi)) {
+
+            $indexStart = count($dataApi)-1; //nothing to import
+
+        } else if (!is_null($lastDateInDb) and strtotime($lastDateInDb['date']) < strtotime($lastDateInApi)) {
+
+            $indexStart = $this->GetIndexToStart($dataApi, $lastDateInDb['date'], $mintimeConstrain); //start import from returned index
+        }
+
+        $this->SaveInBulk($dataApi, $indexStart, $mintimeConstrain, $maxtimeConstrain);
+
     }
 
-    public function SaveInBulk(Array $dataApi){
 
-        $batchSize = 1000;
+    private function GetIndexToStart(array $dataApi, string $lastDateinDb, int $mintimeConstrain)
+    {
         
+        $lastArrayIndex = count($dataApi) - 1;
+
+        while ($lastArrayIndex > 0) {
+
+            if (strtotime($dataApi[$lastArrayIndex]->date) > $mintimeConstrain && strtotime($dataApi[$lastArrayIndex]->date) <= strtotime($lastDateinDb)) {
+
+                return $lastArrayIndex + 1;
+            }
+
+            $lastArrayIndex--;
+        }
+
+        return $lastArrayIndex;
+    }
+
+    
+
+    private function SaveInBulk(array $dataApi, int $indexStart, int $mintimeConstrain, int $maxtimeConstrain)
+    {
+
         $length = count($dataApi);
-        
-        for ($i = 0; $i < $length; ++$i) {
+        $batchSize = 1000;
+
+        for ($i = $indexStart; $i < $length; ++$i) {
             $data = new Data;
             $data->setTransactionid($dataApi[$i]->transaction_id);
 
-            if(strlen($data->getTransactionid())>18) continue;
-            
+            if (strlen($data->getTransactionid()) > 18) continue;
+
             $data->setToolNumber($dataApi[$i]->tool_number);
             $data->setLatitude($dataApi[$i]->latitude);
             $data->setLongitude($dataApi[$i]->longitude);
-            $data->setDate(new \DateTime($dataApi[$i]->date));
 
+            if(strtotime($dataApi[$i]->date)> $maxtimeConstrain || strtotime($dataApi[$i]->date) < $mintimeConstrain) continue;
+
+            $data->setDate(new \DateTime($dataApi[$i]->date));
             $data->setBatPercentage($dataApi[$i]->bat_percentage);
             $data->setImportDate(new \DateTime($dataApi[$i]->import_date));
 
-             $this->em->persist($data);
-            
+            $this->em->persist($data);
+
             if (($i % $batchSize) === 0) {
                 $this->em->flush();
-                $this->em->clear(); 
+                $this->em->clear();
             }
         }
-        $this->em->flush(); 
+        $this->em->flush();
         $this->em->clear();
-
     }
 }

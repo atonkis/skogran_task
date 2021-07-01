@@ -19,8 +19,9 @@ class TransactionController extends AbstractController
      */
     public function show($date, DataRepository $dr): Response
     {
+
         return $this->render('transaction/index.html.twig', [
-            'data' => $dr->findAll(),
+            'data' => $dr->getLimitData(100),
         ]);
     }
 
@@ -29,19 +30,12 @@ class TransactionController extends AbstractController
     /**
      * @Route("/import/{date}", name="import_data", methods={"POST"})
      */
-    public function import($date, TransactionService $ts, EntityManagerInterface $em)
+    public function import($date, TransactionService $ts)
     {
 
         $dataApi = $ts->getTransactionData($date, $initialPage = 1);
 
-        $canImport = $ts->CanImportData($dataApi);
-
-        if ($canImport) {
-            //SQL logger disabled when processing batches to avoid serious impact on performance 
-            $em->getConnection()->getConfiguration()->setSQLLogger(null);
-
-            $ts->SaveInBulk($dataApi);
-        }
+        $ts->ImportData($dataApi);
 
         return new JsonResponse(['data' => $date]);
     }

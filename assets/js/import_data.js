@@ -6,12 +6,13 @@ $(function () {
     $.ajax({
       method: 'POST',
       url: $link.attr('href'),
+      dataType: 'json'
     }).done(function (data) {
 
-      let obj = JSON.stringify(data);
-      let date = JSON.parse(obj).data;
+      // let obj = JSON.stringify(data);
+      // let date = JSON.parse(obj).data;
 
-      location.href = `/show/${date}`;
+      location.href = `/show/${data.data}`;
     });
   });
 });
