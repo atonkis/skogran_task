@@ -19,13 +19,13 @@ class Data
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=18)
+     * @ORM\Column(type="string", length=18, name="transaction_id")
      * @Groups({"default"})
      */
-    private $transactionid;
+    private $transactionId;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", name="tool_number")
      * @Groups({"default"})
      */
     private $toolNumber;
@@ -49,13 +49,13 @@ class Data
     private $date;
 
     /**
-     * @ORM\Column(type="decimal", precision=5, scale=2)
+     * @ORM\Column(type="decimal", precision=5, scale=2, name="bat_percentage")
      * @Groups({"default"})
      */
     private $batPercentage;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", name="import_date")
      * @Groups({"default"})
      */
     private $importDate;
@@ -65,14 +65,14 @@ class Data
         return $this->id;
     }
 
-    public function getTransactionid(): ?string
+    public function getTransactionId(): ?string
     {
-        return $this->transactionid;
+        return $this->transactionId;
     }
 
-    public function setTransactionid(string $transactionid): self
+    public function setTransactionId(string $transactionId): self
     {
-        $this->transactionid = $transactionid;
+        $this->transactionId = $transactionId;
 
         return $this;
     }

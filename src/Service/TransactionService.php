@@ -4,12 +4,9 @@ namespace App\Service;
 
 use App\Entity\Data;
 use App\Repository\DataRepository;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-
-use function PHPUnit\Framework\isNull;
 
 class TransactionService
 {
@@ -58,7 +55,6 @@ class TransactionService
         return  $this->mergedDataArray;
     }
 
-
     private function getDataFromApi($date, $page)
     {
         $url = "http://159.65.123.24/data/export/{$date}/{$page}";
@@ -78,7 +74,6 @@ class TransactionService
         return json_decode($apiData);
     }
 
-
     public function ImportData(array $dataApi)
     {
 
@@ -94,18 +89,19 @@ class TransactionService
             $indexStart = 0; // import all as db empty
 
         } else if (!is_null($lastDateInDb) and strtotime($lastDateInDb['date']) == strtotime($lastDateInApi)) {
-
-            $indexStart = count($dataApi)-1; //nothing to import
+            
+            $indexStart = count($dataApi); //nothing to import
 
         } else if (!is_null($lastDateInDb) and strtotime($lastDateInDb['date']) < strtotime($lastDateInApi)) {
 
             $indexStart = $this->GetIndexToStart($dataApi, $lastDateInDb['date'], $mintimeConstrain); //start import from returned index
         }
 
-        $this->SaveInBulk($dataApi, $indexStart, $mintimeConstrain, $maxtimeConstrain);
+       $importedData = $this->SaveInBulk($dataApi, $indexStart, $mintimeConstrain, $maxtimeConstrain);
+
+       return $importedData;
 
     }
-
 
     private function GetIndexToStart(array $dataApi, string $lastDateinDb, int $mintimeConstrain)
     {
@@ -124,20 +120,20 @@ class TransactionService
 
         return $lastArrayIndex;
     }
-
     
-    //TODO eliminate unique Date values 
+    //TODO maybe eliminate unique Date values 
     private function SaveInBulk(array $dataApi, int $indexStart, int $mintimeConstrain, int $maxtimeConstrain)
     {
-
+        $importedData = array();
+        
         $length = count($dataApi);
         $batchSize = 1000;
 
         for ($i = $indexStart; $i < $length; ++$i) {
             $data = new Data;
-            $data->setTransactionid($dataApi[$i]->transaction_id);
+            $data->setTransactionId($dataApi[$i]->transaction_id);
 
-            if (strlen($data->getTransactionid()) > 18) continue;
+            if (strlen($data->getTransactionId()) > 18) continue;
 
             $data->setToolNumber($dataApi[$i]->tool_number);
             $data->setLatitude($dataApi[$i]->latitude);
@@ -149,6 +145,8 @@ class TransactionService
             $data->setBatPercentage($dataApi[$i]->bat_percentage);
             $data->setImportDate(new \DateTime($dataApi[$i]->import_date));
 
+            array_push($importedData, $dataApi[$i]);
+            
             $this->em->persist($data);
 
             if (($i % $batchSize) === 0) {
@@ -158,5 +156,9 @@ class TransactionService
         }
         $this->em->flush();
         $this->em->clear();
+
+        return $importedData;
     }
+
+    
 }

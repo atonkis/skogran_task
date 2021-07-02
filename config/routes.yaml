@@ -1,9 +1,7 @@
 show_data:
   path: /show
   controller: App\Controller\TransactionController::show
-  methods: GET
-
+  
 import_data:
   path: /import
   controller: App\Controller\TransactionController::import
-  methods: POST

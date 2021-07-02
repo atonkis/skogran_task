@@ -1,40 +1,44 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-
-
 	<div class="container mt-5">
 		<div class="mx-auto" style="width: 200px;">
 			<a href="{{ path('import_data') }}" class="btn btn-secondary js-import-data">Import data</a>
 		</div>
 		<div class="row mt-2">
-			<table id="datatable" class="table table-striped" style="width:100%">
-				<thead>
-					<tr>
-						<th>Transaction Id</th>
-						<th>Tool number</th>
-						<th>Latitude</th>
-						<th>Longitude</th>
-						<th>Date</th>
-						<th>Bat percentage</th>
-						<th>Import date</th>
-					</tr>
-				</thead>
-                 <tbody>
-                    {% for transaction in data %}
-                        <tr>
-                            <td>{{ transaction.transactionid }}</td>
-                            <td>{{ transaction.toolnumber}}</td>
-                            <td>{{ transaction.latitude }}</td>
-                            <td>{{ transaction.longitude}}</td>
-                            <td>{{ transaction.date |date('Y-m-d H:i:s')}}</td>
-                            <td>{{ transaction.batpercentage}}</td>
-                            <td>{{ transaction.importdate |date('Y-m-d H:i:s')}}</td>
-                        <tr>
-                    {% endfor %}
-                 </tbody>
-			</table>
+			<div id="my_datatable">
+				Loading...
+			</div>
 		</div>
 	</div>
+
+
+	<script src="{{ asset('bundles/datatables/js/datatables.js') }}"></script>
+	<script>
+
+		$(function () {
+		$('#my_datatable').initDataTables({{ datatable_settings(datatable) }}).then(function (dt) {
+
+		$(function () {
+		$('.js-import-data').on('click', function (e) {
+			e.preventDefault();
+
+			let $link = $(e.currentTarget);
+			$.ajax({
+			method: 'POST',
+			url: $link.attr('href'),
+			dataType: 'json',
+			}).done(function (data) {
+
+				 $.each(data.data, function (i,item) {
+					let rowNode = {"transactionId" : item.transaction_id, "toolNumber" : item.tool_number, "longitude": item.longitude, "latitude" : item.latitude, "date" :item.date, "batPercentage" : item.bat_percentage, "importDate": item.import_date};
+					dt.row.add(rowNode).draw();
+    				}); 
+				});
+			});
+		});
+	});
+});
+	</script>
 
 {% endblock %}
