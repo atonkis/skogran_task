@@ -32,8 +32,11 @@
 
 				 $.each(data.data, function (i,item) {
 					let rowNode = {"transactionId" : item.transaction_id, "toolNumber" : item.tool_number, "longitude": item.longitude, "latitude" : item.latitude, "date" :item.date, "batPercentage" : item.bat_percentage, "importDate": item.import_date};
-					dt.row.add(rowNode).draw();
+					dt.row.add(rowNode);
     				}); 
+
+					dt.draw();
+
 				});
 			});
 		});
