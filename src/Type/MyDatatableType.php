@@ -3,10 +3,10 @@
 namespace App\Type;
 
 use App\Entity\Data;
+use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\DataTable;
 use Omines\DataTablesBundle\DataTableTypeInterface;
 use Omines\DataTablesBundle\Column\TextColumn;
-use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\Column\DateTimeColumn;
 use Omines\DataTablesBundle\Column\NumberColumn;
 
@@ -23,7 +23,6 @@ class MyDatatableType implements DataTableTypeInterface
      */
     public function configure(DataTable $dataTable, array $options)
     {
-
         $dataTable
         ->add('transactionId', TextColumn::class, ['label' => 'Transaction Id'])
         ->add('toolNumber', NumberColumn::class, ['label' => 'Tool number'])

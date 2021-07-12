@@ -2,6 +2,14 @@ show_data:
   path: /show
   controller: App\Controller\TransactionController::show
   
+show_server_processing_data:
+  path: /server
+  controller: App\Controller\TransactionController::showServerProcessingData
+  
 import_data:
   path: /import
   controller: App\Controller\TransactionController::import
+
+server_processing:
+  path: /process
+  controller: App\Controller\TransactionController::serverProcessing

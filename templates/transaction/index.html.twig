@@ -14,16 +14,23 @@
 
 
 	<script src="{{ asset('bundles/datatables/js/datatables.js') }}"></script>
+
 	<script>
 
 		$(function () {
-		$('#my_datatable').initDataTables({{ datatable_settings(datatable) }}).then(function (dt) {
+		$('#my_datatable').initDataTables({{ datatable_settings(datatable) }},
+		  {
+			 serverSide: true,
+			   
+            }).then(function (dt) {
 
 		$(function () {
 		$('.js-import-data').on('click', function (e) {
 			e.preventDefault();
 
 			let $link = $(e.currentTarget);
+
+			
 			$.ajax({
 			method: 'POST',
 			url: $link.attr('href'),

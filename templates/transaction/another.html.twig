@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+	<div class="container mt-5">
+		<div class="mx-auto" style="width: 200px;">
+			<a href="{{ path('import_data') }}" class="btn btn-secondary js-import-data">Import data</a>
+		</div>
+		<div class="row mt-2">
+				<table class="records_list table table-striped table-bordered table-hover w-100" id="mydatatable">
+					<thead>
+						<tr>
+							<th>Transaction Id</th>
+							<th>Tool number</th>
+							<th>Latitude</th>
+							<th>Longitude</th>
+							<th>Date</th>
+							<th>Bat percentage</th>
+							<th>Import date</th>
+						</tr>
+					</thead>
+					<tfoot>
+						<tr>
+							<th></th>
+							<th></th>
+							<th></th>
+							<th></th>
+							<th></th>
+							<th></th>
+							<th></th>
+						</tr>
+					</tfoot>
+				</table>
+		</div>
+	</div>
+
+<style>
+#mydatatable tfoot input{
+    width: 100% !important;
+}
+#mydatatable tfoot {
+    display: table-header-group !important;
+}
+ 
+</style>
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+    // Setup - add a text input to each footer cell
+    $('#mydatatable tfoot th').each( function () {
+        $(this).html( '<input type="text" placeholder="Ieškoti ..." />' );
+    } );
+
+
+    var table = $('#mydatatable').DataTable({
+		dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'>>" +
+			"<'row'<'col-sm-12'tr>>" +
+			"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+        responsive: true,
+        language: {
+            url: "https://cdn.datatables.net/plug-ins/1.10.19/i18n/Lithuanian.json",
+        },
+		processing: true,
+        serverSide: true,
+        ordering: false,
+        ajax: {
+            url: '{{ path('server_processing') }}',
+            type: 'POST',
+			dataType: 'json',
+        },
+        columnDefs: [
+            { "name": "transactionId", "targets": 0 },
+            { "name": "toolNumber", "targets": 1 },
+            { "name": "latitude", "targets": 2 },
+            { "name": "longitude", "targets": 3 },
+            { "name": "date", "targets": 4 },
+            { "name": "batPercentage", "targets": 5 },
+            { "name": "importDate", "targets": 6 },
+        ],
+        "initComplete": function () {
+            this.api().columns().every( function () {
+                var that = this;
+                $( 'input', this.footer() ).on( 'keyup change', function () {
+                    if ( that.search() !== this.value ) {
+                        that
+                            .search( this.value )
+                            .draw();
+                        }
+                });
+            })
+        },
+        searchDelay: 1000
+    });
+});
+</script>
+
+{% endblock %}

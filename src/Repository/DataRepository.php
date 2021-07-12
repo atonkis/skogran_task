@@ -22,20 +22,86 @@ class DataRepository extends ServiceEntityRepository
 
     public function getLastDate()
     {
-        return $this->createQueryBuilder('d')
-        ->orderBy('d.id', 'DESC')
-        ->setMaxResults(1)
-        ->select('d.date')
-        ->getQuery()
-        ->getOneOrNullResult(Query::HYDRATE_SCALAR);
+        return $this
+            ->createQueryBuilder('d')
+            ->orderBy('d.id', 'DESC')
+            ->setMaxResults(1)
+            ->select('d.date')
+            ->getQuery()
+            ->getOneOrNullResult(Query::HYDRATE_SCALAR);
     }
 
     public function getLimitData(int $limit)
     {
-        return $this->createQueryBuilder('d')
-        ->setMaxResults($limit)
+        return $this
+            ->createQueryBuilder('d')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function countData()
+    {
+        return $this
+            ->createQueryBuilder('d')
+            ->select("count(d.id)")
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function getRequiredDTData($draw, $start, $length, $columns){
+
+        $dql = $this->createQueryBuilder('d');
+        $dqlCountFiltered = $this->createQueryBuilder('d')->select("count(d.id)");
+        
+        // Filter columns with AND restriction
+        $strColSearch = '';
+        foreach ($columns as $column) {
+            if (!empty($column['search']['value'])) {
+                if (!empty($strColSearch)) {
+                    $strColSearch .= ' AND ';
+                }
+                $strColSearch .= ' d.'.$column['name']." LIKE '%".$column['search']['value']."%'";
+            }
+        }
+
+        if (!empty($strColSearch)) {
+            $dql->andWhere($strColSearch);
+            $dqlCountFiltered->andWhere($strColSearch);
+        }
+               
+        $items = $dql
+        ->setFirstResult($start)
+        ->setMaxResults($length)
         ->getQuery()
         ->getResult();
+        
+
+        $data = [];
+        foreach ($items as $entity) {
+            $data[] = [
+                $entity->getTransactionId(),
+                $entity->getToolNumber(),
+                $entity->getLatitude(),
+                $entity->getLongitude(),
+                $entity->getDate() == null ? "": $entity->getDate()->format('Y-m-d H:i:s'),
+                $entity->getBatPercentage(),
+                $entity->getImportDate() == null ? "": $entity->getImportDate()->format('Y-m-d H:i:s'),
+            ];
+        }
+
+         $recordsTotal = $this->countData();
+        
+         $recordsFiltered = $dqlCountFiltered
+                             ->getQuery()
+                             ->getSingleScalarResult();
+
+
+        return [
+            'draw' => $draw,
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data,
+        ];
     }
-   
 }
