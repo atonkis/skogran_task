@@ -87,7 +87,8 @@ class TransactionController extends AbstractController
         $start = $request->get('start');
         $length = $request->get('length');
         $orders = $request->get("order");
-
+        $search = $request->get('search');
+        
         foreach ($orders as $key => $order)
         {
             // Orders does not contain the name of the column, but its number,
@@ -95,7 +96,7 @@ class TransactionController extends AbstractController
             $orders[$key]['name'] = $columns[$order['column']]['name'];
         }
         
-        $results =  $dataRepository -> getRequiredDTData($draw, $start, $length, $columns, $orders);
+        $results =  $dataRepository -> getRequiredDTData($draw, $start, $length, $columns, $orders, $search);
 
         return $this->json($results);
     }

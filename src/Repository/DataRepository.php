@@ -49,10 +49,24 @@ class DataRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
-    public function getRequiredDTData($draw, $start, $length, $columns, $orders){
+    public function getRequiredDTData($draw, $start, $length, $columns, $orders, $search){
 
         $dql = $this->createQueryBuilder('d');
         $dqlCountFiltered = $this->createQueryBuilder('d')->select("count(d.id)");
+        
+
+        if (!empty($search['value'])) {
+            $strMainSearch = $search['value'];
+
+            foreach ($columns as $column) {
+    
+                    $mainFilter = 'd.'.$column['name']." LIKE '%".$strMainSearch."%'";
+                    $dql->orWhere($mainFilter);
+                    $dqlCountFiltered->orWhere($mainFilter);
+            }
+        }
+
+
         
         foreach ($columns as $column) {
             if (!empty($column['search']['value'])) {

@@ -55,7 +55,10 @@ $(document).ready(function() {
 
 
     var table = $('#mydatatable').DataTable({
-		dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'>>" +
+
+		
+
+		dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
 			"<'row'<'col-sm-12'tr>>" +
 			"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
         responsive: true,
@@ -65,25 +68,26 @@ $(document).ready(function() {
 		processing: true,
         serverSide: true,
         ordering: true,
-		fixedColumns: true,
+		autowidth: true,
+
         ajax:{
             url: '{{ path('server_processing') }}',
             type: 'POST',
 			dataType: 'json',
         },
 		columnDefs: [
-            { "name": "transactionId", "targets": 0, "width": "80%" },
-            { "name": "toolNumber", "targets": 1 , "width": "80%"},
-            { "name": "latitude", "targets": 2 },
-            { "name": "longitude", "targets": 3 },
-            { "name": "date", "targets": 4 },
-            { "name": "batPercentage", "targets": 5 },
-            { "name": "importDate", "targets": 6 },
+            { "name": "transactionId", "targets": 0, "width": "20%" },
+            { "name": "toolNumber", "targets": 1 , "width": "5%"},
+            { "name": "latitude", "targets": 2, "width": "5%"},
+            { "name": "longitude", "targets": 3, "width": "5%"},
+            { "name": "date", "targets": 4, "width": "30%"},
+            { "name": "batPercentage", "targets": 5, "width": "5%"},
+            { "name": "importDate", "targets": 6, "width": "30%"},
         ],
 
 
         "initComplete": function ( settings, json) {
-
+                
             this.api().columns().every( function () {
                 var that = this;
                 $( 'input', this.footer() ).on( 'keyup change', function () {
