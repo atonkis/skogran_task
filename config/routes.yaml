@@ -10,6 +10,10 @@ import_data:
   path: /import
   controller: App\Controller\TransactionController::import
 
+import_data_with_paging:
+  path: /importData
+  controller: App\Controller\TransactionController::importData
+
 server_processing:
   path: /process
   controller: App\Controller\TransactionController::serverProcessing

@@ -103,6 +103,33 @@ class TransactionService
 
     }
 
+    public function ImportDataB(array $dataApi)
+    {
+
+        $mintimeConstrain = strtotime("-1 year", time());
+        $maxtimeConstrain = time();
+        
+        $indexStart = 0;
+        $lastDateInDb = $this->dr->getLastDate();
+        $lastDateInApi = $dataApi[array_key_last($dataApi)]->date;
+
+        if (is_null($lastDateInDb)) {
+
+            $indexStart = 0; // import all as db empty
+
+        } else if (!is_null($lastDateInDb) and strtotime($lastDateInDb['date']) == strtotime($lastDateInApi)) {
+            
+            $indexStart = count($dataApi); //nothing to import
+
+        } else if (!is_null($lastDateInDb) and strtotime($lastDateInDb['date']) < strtotime($lastDateInApi)) {
+
+            $indexStart = $this->GetIndexToStart($dataApi, $lastDateInDb['date'], $mintimeConstrain); //start import from returned index
+        }
+
+       $this->SaveInBulkB($dataApi, $indexStart, $mintimeConstrain, $maxtimeConstrain);
+
+    }
+
     private function GetIndexToStart(array $dataApi, string $lastDateinDb, int $mintimeConstrain)
     {
         
@@ -121,7 +148,6 @@ class TransactionService
         return $lastArrayIndex;
     }
     
-    //TODO maybe eliminate unique Date values 
     private function SaveInBulk(array $dataApi, int $indexStart, int $mintimeConstrain, int $maxtimeConstrain)
     {
         $importedData = array();
@@ -158,6 +184,39 @@ class TransactionService
         $this->em->clear();
 
         return $importedData;
+    }
+
+    private function SaveInBulkB(array $dataApi, int $indexStart, int $mintimeConstrain, int $maxtimeConstrain)
+    {
+        $length = count($dataApi);
+        $batchSize = 1000;
+
+        for ($i = $indexStart; $i < $length; ++$i) {
+            $data = new Data;
+            $data->setTransactionId($dataApi[$i]->transaction_id);
+
+            if (strlen($data->getTransactionId()) > 18) continue;
+
+            $data->setToolNumber($dataApi[$i]->tool_number);
+            $data->setLatitude($dataApi[$i]->latitude);
+            $data->setLongitude($dataApi[$i]->longitude);
+
+            if(strtotime($dataApi[$i]->date)> $maxtimeConstrain || strtotime($dataApi[$i]->date) < $mintimeConstrain) continue;
+
+            $data->setDate(new \DateTime($dataApi[$i]->date));
+            $data->setBatPercentage($dataApi[$i]->bat_percentage);
+            $data->setImportDate(new \DateTime($dataApi[$i]->import_date));
+
+            $this->em->persist($data);
+
+            if (($i % $batchSize) === 0) {
+                $this->em->flush();
+                $this->em->clear();
+            }
+        }
+        $this->em->flush();
+        $this->em->clear();
+
     }
 
     

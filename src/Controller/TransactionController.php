@@ -33,9 +33,9 @@ class TransactionController extends AbstractController
     }
 
     // /**
-    //  * @Route("/import", name="import_data", methods={"POST"})
+    //  * @Route("/import", name="import_data")
     //  */
-    public function import(Request $req, TransactionService $ts): JsonResponse
+    public function import(TransactionService $ts): JsonResponse
     {
 
         $date = $ts->getDateForDataApiRequest($this->getParameter('default.initial.date'));
@@ -45,17 +45,32 @@ class TransactionController extends AbstractController
         $importedData =  $ts->ImportData($dataApi);
 
         return new JsonResponse(['data' => $importedData]);
+        
+    }
+
+    // /**
+    //  * @Route("/importdata", name="import_data_with_paging")
+    //  */
+    public function importData(TransactionService $ts): JsonResponse
+    {
+
+        $date = $ts->getDateForDataApiRequest($this->getParameter('default.initial.date'));
+
+        $dataApi = $ts->getTransactionData($date, $initialPage = 1);
+
+        $ts->ImportDataB($dataApi);
+
+        return new JsonResponse(['data' => "success"]);
+        
     }
 
 
     /**
      * @Route("/server", name="show_server_processing_data")
      */
-    public function showServerProcessingData(Request $request, DataRepository $dataRepository): Response
+    public function showServerProcessingData(): Response
     {
-        $data['recordsTotal'] = $dataRepository->countData();
-
-        return $this->render('transaction/another.html.twig', ['data' => $data]);
+        return $this->render('transaction/another.html.twig');
     }
 
 

@@ -3,7 +3,7 @@
 {% block body %}
 	<div class="container mt-5">
 		<div class="mx-auto" style="width: 200px;">
-			<a href="{{ path('import_data') }}" class="btn btn-secondary js-import-data">Import data</a>
+			<a href="{{ path('import_data_with_paging') }}" class="btn btn-secondary js-import-data">Import data</a>
 		</div>
 		<div class="row mt-2">
 				<table class="records_list table table-striped table-bordered table-hover w-100" id="mydatatable">
@@ -63,7 +63,7 @@ $(document).ready(function() {
 		processing: true,
         serverSide: true,
         ordering: false,
-        ajax: {
+        ajax:{
             url: '{{ path('server_processing') }}',
             type: 'POST',
 			dataType: 'json',
@@ -77,7 +77,10 @@ $(document).ready(function() {
             { "name": "batPercentage", "targets": 5 },
             { "name": "importDate", "targets": 6 },
         ],
-        "initComplete": function () {
+
+
+        "initComplete": function ( settings, json) {
+
             this.api().columns().every( function () {
                 var that = this;
                 $( 'input', this.footer() ).on( 'keyup change', function () {
@@ -91,6 +94,26 @@ $(document).ready(function() {
         },
         searchDelay: 1000
     });
+
+
+		$(function () {
+		$('.js-import-data').on('click', function (e) {
+			e.preventDefault();
+
+			let $link = $(e.currentTarget);
+			
+			$.ajax({
+			method: 'POST',
+			url: $link.attr('href'),
+			dataType: 'json',
+			}).done(function (data) {
+
+					table.draw();
+
+				});
+			});
+		});
+
 });
 </script>
 
