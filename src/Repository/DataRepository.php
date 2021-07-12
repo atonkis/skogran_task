@@ -49,27 +49,26 @@ class DataRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
-    public function getRequiredDTData($draw, $start, $length, $columns){
+    public function getRequiredDTData($draw, $start, $length, $columns, $orders){
 
         $dql = $this->createQueryBuilder('d');
         $dqlCountFiltered = $this->createQueryBuilder('d')->select("count(d.id)");
         
-        // Filter columns with AND restriction
-        $strColSearch = '';
         foreach ($columns as $column) {
             if (!empty($column['search']['value'])) {
-                if (!empty($strColSearch)) {
-                    $strColSearch .= ' AND ';
-                }
-                $strColSearch .= ' d.'.$column['name']." LIKE '%".$column['search']['value']."%'";
+
+                $strColSearch = ' d.'.$column['name']." LIKE '%".$column['search']['value']."%'";
+                $dql->andWhere($strColSearch);
+                $dqlCountFiltered->andWhere($strColSearch);
             }
         }
 
-        if (!empty($strColSearch)) {
-            $dql->andWhere($strColSearch);
-            $dqlCountFiltered->andWhere($strColSearch);
+        foreach ($orders as $order) {
+            if (!empty($order['name'])) {
+                $dql->addOrderBy('d.'.$order['name'], $order['dir']);
+            }
         }
-               
+        
         $items = $dql
         ->setFirstResult($start)
         ->setMaxResults($length)

@@ -2,6 +2,7 @@
 
 {% block body %}
 	<div class="container mt-5">
+       
 		<div class="mx-auto" style="width: 200px;">
 			<a href="{{ path('import_data_with_paging') }}" class="btn btn-secondary js-import-data">Import data</a>
 		</div>
@@ -62,13 +63,13 @@ $(document).ready(function() {
         },
 		processing: true,
         serverSide: true,
-        ordering: false,
+        ordering: true,
         ajax:{
             url: '{{ path('server_processing') }}',
             type: 'POST',
 			dataType: 'json',
         },
-        columnDefs: [
+		columnDefs: [
             { "name": "transactionId", "targets": 0 },
             { "name": "toolNumber", "targets": 1 },
             { "name": "latitude", "targets": 2 },
@@ -115,6 +116,8 @@ $(document).ready(function() {
 		});
 
 });
+
+
 </script>
 
 {% endblock %}

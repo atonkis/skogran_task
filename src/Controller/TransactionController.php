@@ -70,6 +70,9 @@ class TransactionController extends AbstractController
      */
     public function showServerProcessingData(): Response
     {
+
+        // $this->addFlash('success', 'Duomenys apdoroti!');
+        
         return $this->render('transaction/another.html.twig');
     }
 
@@ -83,9 +86,16 @@ class TransactionController extends AbstractController
         $columns = $request->get('columns');
         $start = $request->get('start');
         $length = $request->get('length');
+        $orders = $request->get("order");
 
-        // Get results from the Repository
-        $results =  $dataRepository -> getRequiredDTData($draw, $start, $length, $columns);
+        foreach ($orders as $key => $order)
+        {
+            // Orders does not contain the name of the column, but its number,
+            // so add the name so we can handle it just like the $columns array
+            $orders[$key]['name'] = $columns[$order['column']]['name'];
+        }
+        
+        $results =  $dataRepository -> getRequiredDTData($draw, $start, $length, $columns, $orders);
 
         return $this->json($results);
     }
