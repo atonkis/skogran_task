@@ -109,7 +109,9 @@ $(document).ready(function() {
 			dataType: 'json',
 			}).done(function (data) {
 
+				if(data.update){
 					table.draw();
+				}
 
 				});
 			});

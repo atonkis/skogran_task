@@ -57,7 +57,7 @@ class DataRepository extends ServiceEntityRepository
         foreach ($columns as $column) {
             if (!empty($column['search']['value'])) {
 
-                $strColSearch = ' d.'.$column['name']." LIKE '%".$column['search']['value']."%'";
+                $strColSearch = 'd.'.$column['name']." LIKE '%".$column['search']['value']."%'";
                 $dql->andWhere($strColSearch);
                 $dqlCountFiltered->andWhere($strColSearch);
             }

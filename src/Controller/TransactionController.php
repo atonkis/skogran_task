@@ -58,9 +58,9 @@ class TransactionController extends AbstractController
 
         $dataApi = $ts->getTransactionData($date, $initialPage = 1);
 
-        $ts->ImportDataB($dataApi);
+        $isImported = $ts->ImportDataB($dataApi);
 
-        return new JsonResponse(['data' => "success"]);
+        return new JsonResponse(['update' => $isImported]);
         
     }
 

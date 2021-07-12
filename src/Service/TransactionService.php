@@ -126,8 +126,9 @@ class TransactionService
             $indexStart = $this->GetIndexToStart($dataApi, $lastDateInDb['date'], $mintimeConstrain); //start import from returned index
         }
 
-       $this->SaveInBulkB($dataApi, $indexStart, $mintimeConstrain, $maxtimeConstrain);
+       $isImported = $this->SaveInBulkB($dataApi, $indexStart, $mintimeConstrain, $maxtimeConstrain);
 
+       return $isImported;
     }
 
     private function GetIndexToStart(array $dataApi, string $lastDateinDb, int $mintimeConstrain)
@@ -151,7 +152,6 @@ class TransactionService
     private function SaveInBulk(array $dataApi, int $indexStart, int $mintimeConstrain, int $maxtimeConstrain)
     {
         $importedData = array();
-        
         $length = count($dataApi);
         $batchSize = 1000;
 
@@ -190,6 +190,7 @@ class TransactionService
     {
         $length = count($dataApi);
         $batchSize = 1000;
+        $isImported = false;
 
         for ($i = $indexStart; $i < $length; ++$i) {
             $data = new Data;
@@ -213,9 +214,13 @@ class TransactionService
                 $this->em->flush();
                 $this->em->clear();
             }
+
+           $isImported = true; 
         }
         $this->em->flush();
         $this->em->clear();
+
+        return $isImported;
 
     }
 
